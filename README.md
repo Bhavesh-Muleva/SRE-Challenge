@@ -42,24 +42,34 @@ A reproducible SRE challenge repository that simulates a broken Kubernetes envir
 If using `kind` (recommended for local evaluation):
 
 # create kind cluster (optional)
-```cd cluster
-./create-cluster.sh```
+```bash
+cd cluster
+./create-cluster.sh
+```
 
 How to reproduce (minimal reviewer steps)
 Deploy the broken environment
 
-```cd scripts
-./deploy-broken.sh```
+```bash
+cd scripts
+./deploy-broken.sh
+```
 
 # wait a few seconds for pods to start
-```kubectl get pods -o wide```
+```bash
+kubectl get pods -o wide
+```
 
 (Optional) Install monitoring
 # inside scripts/ (this installs Prometheus + Grafana + metrics-server)
-```./install-monitoring.sh```
+```bash
+./install-monitoring.sh
+```
 
 # then port-forward Grafana:
-```kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80```
+```bash
+kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80
+```
 
 # visit http://localhost:3000 (user: admin / password: prom-operator)
 Run diagnostics
@@ -68,7 +78,9 @@ All diagnostic output captured during my work is in the troubleshooting/ directo
 
 Apply fixes
 # apply fixes (manifests under environment/after-fix)
-```./deploy-fixed.sh```
+```bash
+./deploy-fixed.sh
+```
 
 Validate
 Validation artifacts (command outputs) are stored under each problem's validation folder in troubleshooting folder.
@@ -135,5 +147,7 @@ All kubectl outputs used as evidence are included as .txt files inside the appro
 
 Cleanup
 To delete deployed resources:
-```cd scripts
-./cleanup.sh```
+```bash
+cd scripts
+./cleanup.sh
+```
