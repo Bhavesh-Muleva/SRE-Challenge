@@ -1,152 +1,199 @@
-# Atlan — SRE-II Challenge (Final Submission)
+# Challenge (Submission)
 
-**Author:** Bhavesh Muleva  
-**Date:** 2025
+Author: Bhavesh Muleva
 
-A reproducible SRE challenge repository that simulates a broken Kubernetes environment (4 deliberate failures), documents diagnostics, applies fixes, validates results, and includes monitoring evidence.
+This repository contains a reproducible SRE challenge environment with four deliberate Kubernetes failures. It includes diagnostics, fixes, validation artifacts, monitoring setup, and documentation.
 
 ---
 
 ## Status
-- Broken environment and fixes implemented ✅  
-- Diagnostics, fixes and validation artifacts included ✅  
-- Grafana dashboard screenshots + exported JSON included ✅  
-- Report, RCA, Improvements, and Grafana docs included ✅
+
+- Broken environment recreated  
+- All four problems diagnosed and fixed  
+- Validation artifacts included  
+- Grafana dashboards and exported JSON included  
+- Report, RCA, Improvements, Monitoring documentation included  
 
 ---
 
-## Quick index
+## Directory Overview
 
-- `environment/before-fix/` — manifests that create the broken state.  
-- `environment/after-fix/` — manifests with fixes applied.  
-- `troubleshooting/` — per-problem `diagnostics/`, `fix/`, `validation/` folders.  
-- `scripts/` — automation:
-  - `deploy-broken.sh` — deploy the broken environment
-  - `deploy-fixed.sh` — apply fixes
-  - `install-monitoring.sh` — install kube-prometheus-stack + metrics-server
-  - `cleanup.sh` — tear down resources
-  - `test-connectivity.sh` — quick connectivity checks
-  - `debug-commands.md` — common troubleshooting commands
-  - `grafana-dashboard.json` — exported dashboard JSON
-- `docs/` — `REPORT.md`, `RCA.md`, `IMPROVEMENTS.md`, `GRAFANA.md`
-- `screenshots/grafana/` — Grafana screenshots used as evidence
+- environment/before-fix/ — manifests creating the broken environment  
+- environment/after-fix/ — manifests containing fixes  
+- troubleshooting/ — diagnostics, fixes, validation (per problem)  
+- scripts/  
+  - deploy-broken.sh  
+  - deploy-fixed.sh  
+  - install-monitoring.sh  
+  - cleanup.sh  
+  - test-connectivity.sh  
+  - debug-commands.md  
+  - grafana-dashboard.json  
+- docs/  
+  - REPORT.md  
+  - RCA.md  
+  - IMPROVEMENTS.md  
+  - GRAFANA.md  
+- screenshots/grafana/ — Grafana screenshots used as evidence  
 
 ---
 
 ## Prerequisites
 
-- `kubectl` configured to target the cluster (kind, minikube, or cloud cluster)  
-- `helm` (v3) installed for monitoring stack (optional for core troubleshooting)  
-- `bash` / POSIX shell
+- kubectl installed and configured  
+- helm v3 installed  
+- Bash or POSIX-compliant shell  
+- (Optional) kind for local testing  
 
-If using `kind` (recommended for local evaluation):
+### Create a kind cluster (optional)
 
-# create kind cluster (optional)
 ```bash
 cd cluster
 ./create-cluster.sh
 ```
 
-How to reproduce (minimal reviewer steps)
-Deploy the broken environment
+---
+
+# How to Reproduce
+
+## 1. Deploy the broken environment
 
 ```bash
 cd scripts
 ./deploy-broken.sh
 ```
 
-# wait a few seconds for pods to start
+Check pod status:
+
 ```bash
 kubectl get pods -o wide
 ```
 
-(Optional) Install monitoring
-# inside scripts/ (this installs Prometheus + Grafana + metrics-server)
+---
+
+## 2. (Optional) Install monitoring
+
+Run:
+
 ```bash
 ./install-monitoring.sh
 ```
 
-# then port-forward Grafana:
+Port-forward Grafana:
+
 ```bash
 kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80
 ```
 
-# visit http://localhost:3000 (user: admin / password: prom-operator)
-Run diagnostics
-The full command list used is in scripts/debug-commands.md.
-All diagnostic output captured during my work is in the troubleshooting/ directories. Reviewers can open those .txt files to see the exact kubectl outputs and logs.
+Visit:
 
-Apply fixes
-# apply fixes (manifests under environment/after-fix)
+```
+http://localhost:3000
+```
+
+Username: admin  
+Password: from Grafana secret
+
+---
+
+## 3. Run diagnostics
+
+All commands used are listed in:
+
+```
+scripts/debug-commands.md
+```
+
+Diagnostic outputs are stored in:
+
+```
+troubleshooting/problem-*/diagnostics/
+```
+
+---
+
+## 4. Apply fixes
+
 ```bash
 ./deploy-fixed.sh
 ```
 
-Validate
-Validation artifacts (command outputs) are stored under each problem's validation folder in troubleshooting folder.
+Fixes are taken from:
 
-Grafana screenshots are in screenshots/grafana/.
+```
+environment/after-fix/
+```
 
-Key files:
+---
 
-troubleshooting/problem-1-networkpolicy-dns/validation/*
+# Validation
 
-troubleshooting/problem-2-service-dns-and-endpoints/validation/*
+Validation artifacts (kubectl outputs, logs, connectivity tests, before/after comparisons) are stored under each problem’s validation directory:
 
-troubleshooting/problem-3-memory-oom/validation/*
+- troubleshooting/problem-1-networkpolicy-dns/validation/  
+- troubleshooting/problem-2-service-dns-and-endpoints/validation/  
+- troubleshooting/problem-3-memory-oom/validation/  
+- troubleshooting/problem-4-networkpolicy-dns/validation/  
 
-troubleshooting/problem-4-networkpolicy-dns/validation/*
+Grafana screenshots:
 
-What I changed (high level)
-Allowed DNS traffic in NetworkPolicy (fix for DNS blocking)
+```
+screenshots/grafana/
+```
 
-Corrected frontend BACKEND_URL environment variable
+Exported Grafana dashboard JSON:
 
-Fixed backend Service selector so endpoints populate
+```
+scripts/grafana-dashboard.json
+```
 
-Increased frontend memory limits to prevent OOMKilled
+All command outputs are saved as `.txt` files inside the diagnostics/ and validation/ folders.
 
-Added monitoring via kube-prometheus-stack and captured evidence in Grafana screenshots
+---
 
-Full technical details, PromQL queries and screenshots documented in docs/GRAFANA.md.
+# Summary of Fixes
 
-Deliverables (what I included)
-environment/before-fix/ — broken manifests
+- Allowed DNS traffic in NetworkPolicy  
+- Corrected BACKEND_URL environment variable in frontend  
+- Fixed backend Service selector so endpoints populate  
+- Increased frontend memory limits to prevent OOMKilled  
+- Installed kube-prometheus-stack and captured monitoring evidence  
+- Added PromQL queries and dashboard analysis in docs/GRAFANA.md  
 
-environment/after-fix/ — fixed manifests
+---
 
-troubleshooting/* — diagnostics, fixes, validation artifacts (per problem)
+# Deliverables
 
-scripts/ — automation and debug commands
+- environment/before-fix/ — broken manifests  
+- environment/after-fix/ — fixed manifests  
+- troubleshooting/* — diagnostics, fixes, validation  
+- scripts/ — deployment, monitoring, cleanup, debugging scripts  
+- docs/REPORT.md — final report  
+- docs/RCA.md  
+- docs/IMPROVEMENTS.md  
+- docs/GRAFANA.md  
+- screenshots/grafana/ — dashboard screenshots  
+- scripts/grafana-dashboard.json — exported dashboard  
 
-docs/REPORT.md — final report (Markdown)
+---
 
-docs/RCA.md, docs/IMPROVEMENTS.md, docs/GRAFANA.md
+# Recommended Review Order
 
-screenshots/grafana/ — 5 screenshots showing the monitoring evidence
+1. docs/REPORT.md  
+2. docs/RCA.md  
+3. troubleshooting/problem-*/diagnostics/  
+4. environment/before-fix/  
+5. environment/after-fix/  
+6. troubleshooting/problem-*/validation/  
+7. screenshots/grafana/  
+8. docs/GRAFANA.md  
 
-scripts/grafana-dashboard.json — exported Grafana dashboard JSON
+---
 
-Recommended order for reviewers
-Open docs/REPORT.md (high-level summary)
+# Cleanup
 
-Read docs/RCA.md (root cause analysis)
+To delete all deployed resources:
 
-Inspect troubleshooting/problem-*/diagnostics/* files to see raw evidence
-
-Inspect environment/before-fix/ to understand the broken manifests
-
-Inspect environment/after-fix/ for the actual fixes
-
-Confirm via troubleshooting/problem-*/validation/* that fixes applied cleanly
-
-Check Grafana screenshots in screenshots/grafana/ and docs/GRAFANA.md
-
-
-All kubectl outputs used as evidence are included as .txt files inside the appropriate troubleshooting/*/diagnostics and troubleshooting/*/validation folders.
-
-Cleanup
-To delete deployed resources:
 ```bash
 cd scripts
 ./cleanup.sh
