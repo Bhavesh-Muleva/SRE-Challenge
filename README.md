@@ -13,11 +13,9 @@ A reproducible SRE challenge repository that simulates a broken Kubernetes envir
 - Grafana dashboard screenshots + exported JSON included ✅  
 - Report, RCA, Improvements, and Grafana docs included ✅
 
-> Report format: `REPORT.md` (Markdown). Markdown is acceptable for submission; PDF is optional.
-
 ---
 
-## Quick index (what reviewers will want to look at)
+## Quick index
 
 - `environment/before-fix/` — manifests that create the broken state.  
 - `environment/after-fix/` — manifests with fixes applied.  
@@ -45,39 +43,36 @@ If using `kind` (recommended for local evaluation):
 
 ```bash
 # create kind cluster (optional)
-cd cluster
-./create-cluster.sh
+```cd cluster
+./create-cluster.sh```
+
 How to reproduce (minimal reviewer steps)
 Deploy the broken environment
 
-bash
-Copy code
-cd scripts
-./deploy-broken.sh
-# wait a few seconds for pods to start
-kubectl get pods -o wide
-(Optional) Install monitoring
+```cd scripts
+./deploy-broken.sh```
 
-bash
-Copy code
+# wait a few seconds for pods to start
+```kubectl get pods -o wide```
+
+(Optional) Install monitoring
 # inside scripts/ (this installs Prometheus + Grafana + metrics-server)
-./install-monitoring.sh
+```./install-monitoring.sh```
+
 # then port-forward Grafana:
-kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80
+```kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80```
+
 # visit http://localhost:3000 (user: admin / password: prom-operator)
 Run diagnostics
 The full command list used is in scripts/debug-commands.md.
 All diagnostic output captured during my work is in the troubleshooting/ directories. Reviewers can open those .txt files to see the exact kubectl outputs and logs.
 
 Apply fixes
-
-bash
-Copy code
 # apply fixes (manifests under environment/after-fix)
-./deploy-fixed.sh
-Validate
+```./deploy-fixed.sh```
 
-Validation artifacts (command outputs) are stored under each problem's validation/ folder in troubleshooting/.
+Validate
+Validation artifacts (command outputs) are stored under each problem's validation folder in troubleshooting folder.
 
 Grafana screenshots are in screenshots/grafana/.
 
@@ -136,15 +131,10 @@ Confirm via troubleshooting/problem-*/validation/* that fixes applied cleanly
 
 Check Grafana screenshots in screenshots/grafana/ and docs/GRAFANA.md
 
-Notes for evaluators
-The main report is provided as Markdown (docs/REPORT.md). Markdown is acceptable because it is human-readable in GitHub; generating a PDF is optional. If you prefer a PDF, I can export REPORT.md to REPORT.pdf on request.
 
 All kubectl outputs used as evidence are included as .txt files inside the appropriate troubleshooting/*/diagnostics and troubleshooting/*/validation folders.
 
 Cleanup
 To delete deployed resources:
-
-bash
-Copy code
-cd scripts
-./cleanup.sh
+```cd scripts
+./cleanup.sh```
