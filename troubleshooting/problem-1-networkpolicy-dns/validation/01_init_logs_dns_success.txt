@@ -1,4 +1,4 @@
-NOTE: here making DNS operational was the main goal
+NOTE: Making DNS operational was the main goal here in this problem we fixed the host resolve in problem-2.
 
 kubectl logs deploy/frontend -c wait-for-backend
 
