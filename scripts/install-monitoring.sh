@@ -22,12 +22,11 @@ echo "=============================================="
 echo "Installing Metrics Server"
 echo "=============================================="
 
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm repo update
+curl -LO https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
-helm upgrade --install metrics-server metrics-server/metrics-server \
-  -n kube-system \
-  -f ./metrics-server-values.yaml
+kubectl patch deployment metrics-server -n kube-system \
+  --type=json \
+  -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
 
 echo ""
 echo "Monitoring stack installed successfully!"
