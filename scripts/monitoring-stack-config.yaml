@@ -1,0 +1,36 @@
+grafana:
+  service:
+    type: NodePort
+  adminUser: admin
+
+prometheus:
+  prometheusSpec:
+    scrapeInterval: "30s"
+    evaluationInterval: "30s"
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    additionalScrapeConfigs: []
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+kubelet:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    https: true
+    insecureSkipVerify: true
+    # This is the key: Enable cAdvisor metrics for pods
+    cAdvisor: true
+    cAdvisorRelabelConfig:
+      - action: replace
+        targetLabel: instance
+        sourceLabels: [node]
+    metricRelabelings: []
+    interval: "30s"
+
+prometheusOperator:
+  createCustomResource: true

@@ -1,0 +1,10 @@
+
+Non-authoritative answer:
+Name:	google.com
+Address: 2404:6800:4009:81d::200e
+
+[2] DNS OK. Checking backend URL connectivity...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (6) Could not resolve host: backend-svc-wrong.default.svc.cluster.local
+Backend URL check failed (doesn't exist or incorrect name).

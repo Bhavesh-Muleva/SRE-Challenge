@@ -1,0 +1,2 @@
+NAME                        CPU(cores)   MEMORY(bytes)   
+frontend-6444b6db87-zjsq8   1000m        52Mi            

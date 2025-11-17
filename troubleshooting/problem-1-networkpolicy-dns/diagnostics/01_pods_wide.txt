@@ -1,0 +1,5 @@
+kubectl get pods -o wide
+
+NAME                        READY   STATUS                  RESTARTS      AGE     IP            NODE                   NOMINATED NODE   READINESS GATES
+backend-6cd8cdff58-dnjx8    1/1     Running                 0             123m    10.244.1.12   atlan-cluster-worker   <none>           <none>
+frontend-5474b8597c-b47zh   0/1     Init:CrashLoopBackOff   5 (25s ago)   3m50s   10.244.1.23   atlan-cluster-worker   <none>           <none>

@@ -1,0 +1,3 @@
+kubectl logs -l app=frontend -c frontend
+
+Starting frontend workload

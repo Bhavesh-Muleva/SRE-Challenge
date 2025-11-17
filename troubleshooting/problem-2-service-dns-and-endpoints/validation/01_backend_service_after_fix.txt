@@ -1,0 +1,9 @@
+kubectl get svc,ep -o wide
+
+NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE     SELECTOR
+service/backend-svc   ClusterIP   10.96.185.78   <none>        80/TCP    3h10m   app=backend-api
+service/kubernetes    ClusterIP   10.96.0.1      <none>        443/TCP   4h21m   <none>
+
+NAME                    ENDPOINTS          AGE
+endpoints/backend-svc   10.244.1.12:5678   3h10m
+endpoints/kubernetes    172.18.0.3:6443    4h21m

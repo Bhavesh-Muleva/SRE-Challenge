@@ -1,0 +1,108 @@
+Name:             frontend-6444b6db87-zjsq8
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             atlan-cluster-worker/172.18.0.2
+Start Time:       Sun, 16 Nov 2025 18:21:13 +0530
+Labels:           app=frontend
+                  pod-template-hash=6444b6db87
+Annotations:      <none>
+Status:           Running
+IP:               10.244.1.39
+IPs:
+  IP:           10.244.1.39
+Controlled By:  ReplicaSet/frontend-6444b6db87
+Init Containers:
+  wait-for-backend:
+    Container ID:  containerd://da6fd0e553b538789e0d9a081ddedef3f110447d25596e282aa44b868c66355c
+    Image:         curlimages/curl:7.87.0
+    Image ID:      docker.io/curlimages/curl@sha256:f7f265d5c64eb4463a43a99b6bf773f9e61a50aaa7cefaf564f43e42549a01dd
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+    Args:
+      echo "[1] Checking DNS connectivity..."
+      if ! nslookup google.com; then
+        echo "DNS check failed: cannot resolve google.com"
+        exit 1
+      fi
+      
+      echo "[2] DNS OK. Checking backend URL connectivity..."
+      
+      if ! curl -f --max-time 2 http://backend-svc.default.svc.cluster.local; then
+        echo "Backend URL check failed (doesn't exist or incorrect name)."
+        exit 1
+      fi
+      
+      echo "[3] Backend reachable. Init complete."
+      
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sun, 16 Nov 2025 18:21:14 +0530
+      Finished:     Sun, 16 Nov 2025 18:21:14 +0530
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-48pt7 (ro)
+Containers:
+  frontend:
+    Container ID:  containerd://3503dd390982dfb6c8577665317fac6e1bae5612beaaeafd5fdb2b5b963aa1d8
+    Image:         busybox
+    Image ID:      docker.io/library/busybox@sha256:e3652a00a2fabd16ce889f0aa32c38eec347b997e73bd09e69c962ec7f8732ee
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+    Args:
+      echo "Starting frontend workload"
+      # still memory intensive but now allowed
+      while true; do
+        dd if=/dev/zero of=/dev/shm/fill bs=1M count=50
+      done
+      
+    State:          Running
+      Started:      Sun, 16 Nov 2025 18:21:17 +0530
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      memory:  256Mi
+    Requests:
+      memory:  128Mi
+    Environment:
+      BACKEND_URL:  http://backend-svc.default.svc.cluster.local
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-48pt7 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-48pt7:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  24s   default-scheduler  Successfully assigned default/frontend-6444b6db87-zjsq8 to atlan-cluster-worker
+  Normal  Pulled     23s   kubelet            Container image "curlimages/curl:7.87.0" already present on machine
+  Normal  Created    23s   kubelet            Created container: wait-for-backend
+  Normal  Started    23s   kubelet            Started container wait-for-backend
+  Normal  Pulling    23s   kubelet            Pulling image "busybox"
+  Normal  Pulled     21s   kubelet            Successfully pulled image "busybox" in 2.069s (2.069s including waiting). Image size: 1913613 bytes.
+  Normal  Created    20s   kubelet            Created container: frontend
+  Normal  Started    20s   kubelet            Started container frontend

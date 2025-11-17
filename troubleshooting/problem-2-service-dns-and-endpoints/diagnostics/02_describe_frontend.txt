@@ -1,0 +1,107 @@
+Name:             frontend-5474b8597c-cmjwp
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             atlan-cluster-worker/172.18.0.2
+Start Time:       Sun, 16 Nov 2025 15:33:55 +0530
+Labels:           app=frontend
+                  pod-template-hash=5474b8597c
+Annotations:      <none>
+Status:           Pending
+IP:               10.244.1.27
+IPs:
+  IP:           10.244.1.27
+Controlled By:  ReplicaSet/frontend-5474b8597c
+Init Containers:
+  wait-for-backend:
+    Container ID:  containerd://31d4d5617a90f64fe055f40b7ccc637230e3868977e7bdae949241ece4de3514
+    Image:         curlimages/curl:7.87.0
+    Image ID:      docker.io/curlimages/curl@sha256:f7f265d5c64eb4463a43a99b6bf773f9e61a50aaa7cefaf564f43e42549a01dd
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+    Args:
+      echo "[1] Checking DNS connectivity..."
+      if ! nslookup google.com; then
+        echo "DNS check failed: cannot resolve google.com"
+        exit 1
+      fi
+      
+      echo "[2] DNS OK. Checking backend URL connectivity..."
+      
+      if ! curl -f --max-time 2 http://backend-svc-wrong.default.svc.cluster.local; then
+        echo "Backend URL check failed (doesn't exist or incorrect name)."
+        exit 1
+      fi
+      
+      echo "[3] Backend reachable. Init complete."
+      
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Sun, 16 Nov 2025 15:39:41 +0530
+      Finished:     Sun, 16 Nov 2025 15:39:41 +0530
+    Ready:          False
+    Restart Count:  6
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-47kjh (ro)
+Containers:
+  frontend:
+    Container ID:  
+    Image:         busybox
+    Image ID:      
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+    Args:
+      echo "Starting frontend workload"
+      # intentional memory exhaustion
+      dd if=/dev/zero of=/dev/null &
+      sleep 1
+      tail -f /dev/null
+      
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      memory:  30Mi
+    Requests:
+      memory:  20Mi
+    Environment:
+      BACKEND_URL:  http://backend-svc-wrong.default.svc.cluster.local
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-47kjh (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 False 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-47kjh:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  7m39s                  default-scheduler  Successfully assigned default/frontend-5474b8597c-cmjwp to atlan-cluster-worker
+  Warning  BackOff    2m7s (x26 over 7m37s)  kubelet            Back-off restarting failed container wait-for-backend in pod frontend-5474b8597c-cmjwp_default(877bb61c-489f-4307-b5e0-ce3fbd1249c0)
+  Normal   Pulled     113s (x7 over 7m39s)   kubelet            Container image "curlimages/curl:7.87.0" already present on machine
+  Normal   Created    113s (x7 over 7m39s)   kubelet            Created container: wait-for-backend
+  Normal   Started    113s (x7 over 7m39s)   kubelet            Started container wait-for-backend

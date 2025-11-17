@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      initContainers:
+      - name: wait-for-backend
+        image: curlimages/curl:7.87.0
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "[1] Checking DNS connectivity..."
+            if ! nslookup google.com; then
+              echo "DNS check failed: cannot resolve google.com"
+              exit 1
+            fi
+
+            echo "[2] DNS OK. Checking backend URL connectivity..."
+
+            if ! curl -f --max-time 2 http://backend-svc.default.svc.cluster.local; then
+              echo "Backend URL check failed (doesn't exist or incorrect name)."
+              exit 1
+            fi
+
+            echo "[3] Backend reachable. Init complete."
+      containers:
+      - name: frontend
+        image: busybox
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Starting frontend workload"
+            # still memory intensive but now allowed
+            while true; do
+              dd if=/dev/zero of=/dev/shm/fill bs=1M count=50
+            done
+        resources:
+          requests:
+            memory: "128Mi"     # Increased from 20Mi
+          limits:
+            memory: "256Mi"     # Increased from 30Mi
+        env:
+        - name: BACKEND_URL
+          value: "http://backend-svc.default.svc.cluster.local"

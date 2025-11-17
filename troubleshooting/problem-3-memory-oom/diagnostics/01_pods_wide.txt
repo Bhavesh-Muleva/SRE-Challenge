@@ -1,0 +1,2 @@
+NAME                        READY   STATUS      RESTARTS     AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+frontend-798d55d894-bfpth   0/1     OOMKilled   1 (6s ago)   9s    10.244.1.36   atlan-cluster-worker   <none>           <none>

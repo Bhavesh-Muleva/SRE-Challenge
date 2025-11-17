@@ -1,0 +1,26 @@
+#command: kubectl get ep backend-svc -o yaml
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  annotations:
+    endpoints.kubernetes.io/last-change-trigger-time: "2025-11-16T07:34:12Z"
+  creationTimestamp: "2025-11-16T07:34:15Z"
+  labels:
+    endpoints.kubernetes.io/managed-by: endpoint-controller
+  name: backend-svc
+  namespace: default
+  resourceVersion: "22333"
+  uid: 8c82b9d0-4740-421f-9b5e-97b6ac327cbb
+subsets:
+- addresses:
+  - ip: 10.244.1.12
+    nodeName: atlan-cluster-worker
+    targetRef:
+      kind: Pod
+      name: backend-6cd8cdff58-dnjx8
+      namespace: default
+      uid: bbcf6fa6-210b-48d6-bfbf-919f7f7da9d8
+  ports:
+  - port: 5678
+    protocol: TCP

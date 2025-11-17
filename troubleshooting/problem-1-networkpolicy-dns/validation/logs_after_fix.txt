@@ -1,0 +1,20 @@
+kubectl logs deploy/frontend -c wait-for-backend
+
+[1] Checking DNS connectivity...
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+Non-authoritative answer:
+Name:	google.com
+Address: 2404:6800:4009:81d::200e
+
+Non-authoritative answer:
+Name:	google.com
+Address: 172.217.24.14
+
+[2] DNS OK. Checking backend URL connectivity...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (6) Could not resolve host: backend-svc-wrong.default.svc.cluster.local
+Backend URL check failed (doesn't exist or incorrect name).

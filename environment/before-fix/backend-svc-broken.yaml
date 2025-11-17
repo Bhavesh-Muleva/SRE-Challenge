@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+spec:
+  # INTENTIONAL MISCONFIGURATION: selector does NOT match backend pod labels
+  selector:
+    app: backend    # <-- WRONG: backend pods are labeled app=backend-api
+  ports:
+    - port: 80
+      targetPort: 5678

@@ -1,0 +1,6 @@
+kubectl get deploy frontend -o json | jq '.spec.template.spec.containers[].env[] | select(.name=="BACKEND_URL")'
+
+{
+  "name": "BACKEND_URL",
+  "value": "http://backend-svc-wrong.default.svc.cluster.local"
+}
