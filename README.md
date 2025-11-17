@@ -41,7 +41,6 @@ A reproducible SRE challenge repository that simulates a broken Kubernetes envir
 
 If using `kind` (recommended for local evaluation):
 
-```bash
 # create kind cluster (optional)
 ```cd cluster
 ./create-cluster.sh```
