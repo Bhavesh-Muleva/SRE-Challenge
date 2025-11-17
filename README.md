@@ -1,195 +1,150 @@
-Atlan SRE-II Challenge – Final Submission
+# Atlan — SRE-II Challenge (Final Submission)
 
-Author: Bhavesh Muleva
-Tech Stack: Kubernetes, Prometheus, Grafana, Kind, Bash, YAML
-Status: Fully Completed ✔
+**Author:** Bhavesh Muleva  
+**Date:** 2025
 
-📌 Overview
+A reproducible SRE challenge repository that simulates a broken Kubernetes environment (4 deliberate failures), documents diagnostics, applies fixes, validates results, and includes monitoring evidence.
 
-This repository contains the complete solution for the Atlan SRE-II Challenge.
-It includes:
+---
 
-A full simulated broken microservices environment (4 failures)
+## Status
+- Broken environment and fixes implemented ✅  
+- Diagnostics, fixes and validation artifacts included ✅  
+- Grafana dashboard screenshots + exported JSON included ✅  
+- Report, RCA, Improvements, and Grafana docs included ✅
 
-A fully working fixed environment
+> Report format: `REPORT.md` (Markdown). Markdown is acceptable for submission; PDF is optional.
 
-Rich diagnostic evidence, root cause analysis, and validation
+---
 
-Automated scripts to deploy, fix, and monitor the cluster
+## Quick index (what reviewers will want to look at)
 
-Grafana dashboards, screenshots, and documented metrics
+- `environment/before-fix/` — manifests that create the broken state.  
+- `environment/after-fix/` — manifests with fixes applied.  
+- `troubleshooting/` — per-problem `diagnostics/`, `fix/`, `validation/` folders.  
+- `scripts/` — automation:
+  - `deploy-broken.sh` — deploy the broken environment
+  - `deploy-fixed.sh` — apply fixes
+  - `install-monitoring.sh` — install kube-prometheus-stack + metrics-server
+  - `cleanup.sh` — tear down resources
+  - `test-connectivity.sh` — quick connectivity checks
+  - `debug-commands.md` — common troubleshooting commands
+  - `grafana-dashboard.json` — exported dashboard JSON
+- `docs/` — `REPORT.md`, `RCA.md`, `IMPROVEMENTS.md`, `GRAFANA.md`
+- `screenshots/grafana/` — Grafana screenshots used as evidence
 
-A polished final report, RCA, and SRE improvements
+---
 
-Everything is structured according to real SRE incident response flows:
+## Prerequisites
 
-Observe the failure
+- `kubectl` configured to target the cluster (kind, minikube, or cloud cluster)  
+- `helm` (v3) installed for monitoring stack (optional for core troubleshooting)  
+- `bash` / POSIX shell
 
-Diagnose
+If using `kind` (recommended for local evaluation):
 
-Reproduce
+```bash
+# create kind cluster (optional)
+cd cluster
+./create-cluster.sh
+How to reproduce (minimal reviewer steps)
+Deploy the broken environment
 
-Fix
+bash
+Copy code
+cd scripts
+./deploy-broken.sh
+# wait a few seconds for pods to start
+kubectl get pods -o wide
+(Optional) Install monitoring
 
+bash
+Copy code
+# inside scripts/ (this installs Prometheus + Grafana + metrics-server)
+./install-monitoring.sh
+# then port-forward Grafana:
+kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80
+# visit http://localhost:3000 (user: admin / password: prom-operator)
+Run diagnostics
+The full command list used is in scripts/debug-commands.md.
+All diagnostic output captured during my work is in the troubleshooting/ directories. Reviewers can open those .txt files to see the exact kubectl outputs and logs.
+
+Apply fixes
+
+bash
+Copy code
+# apply fixes (manifests under environment/after-fix)
+./deploy-fixed.sh
 Validate
 
-Improve reliability
+Validation artifacts (command outputs) are stored under each problem's validation/ folder in troubleshooting/.
 
-📁 Repository Structure
-.
-├── cluster/                     # Kind cluster creation & deletion scripts
-│   ├── create-cluster.sh
-│   ├── delete-cluster.sh
-│   └── kind-config.yaml
-│
-├── environment/
-│   ├── before-fix/             # ❌ Broken manifests (all 4 issues)
-│   └── after-fix/              # ✅ Corrected manifests
-│
-├── troubleshooting/             # 🔍 Diagnostics, fixes, validation
-│   ├── problem-1-networkpolicy-dns/
-│   ├── problem-2-service-dns-and-endpoints/
-│   ├── problem-3-memory-oom/
-│   └── problem-4-networkpolicy-dns/
-│
-├── scripts/                     # 🛠 Automation
-│   ├── deploy-broken.sh
-│   ├── deploy-fixed.sh
-│   ├── install-monitoring.sh
-│   ├── cleanup.sh
-│   ├── test-connectivity.sh
-│   ├── debug-commands.md
-│   ├── grafana-dashboard.json
-│   └── monitoring-stack-config.yaml
-│
-├── docs/                        # 📘 Final documentation
-│   ├── REPORT.md                # Full submission report
-│   ├── RCA.md                   # Root Cause Analysis
-│   ├── IMPROVEMENTS.md          # SRE improvements after fixes
-│   └── GRAFANA.md               # Dashboards + PromQL + screenshots info
-│
-├── screenshots/
-│   └── grafana/                 # 📊 Grafana dashboards (all included)
-│
-└── README.md                    # 📄 This file
+Grafana screenshots are in screenshots/grafana/.
 
-⚠️ The 4 Issues Simulated
-1️⃣ NetworkPolicy blocking DNS
+Key files:
 
-Blocked UDP/TCP 53
+troubleshooting/problem-1-networkpolicy-dns/validation/*
 
-Frontend init container failed on nslookup
+troubleshooting/problem-2-service-dns-and-endpoints/validation/*
 
-Fixed by adding DNS ports to allowed egress
+troubleshooting/problem-3-memory-oom/validation/*
 
-2️⃣ Wrong backend service name + missing endpoints
+troubleshooting/problem-4-networkpolicy-dns/validation/*
 
-Environment variable pointed to backend-svc-wrong
+What I changed (high level)
+Allowed DNS traffic in NetworkPolicy (fix for DNS blocking)
 
-Backend service selector mismatched → no endpoints
+Corrected frontend BACKEND_URL environment variable
 
-Fixed service selector + corrected backend URL
+Fixed backend Service selector so endpoints populate
 
-3️⃣ OOMKilled in frontend
+Increased frontend memory limits to prevent OOMKilled
 
-Busybox process created infinite memory load
+Added monitoring via kube-prometheus-stack and captured evidence in Grafana screenshots
 
-Container killed with exit code 137
+Full technical details, PromQL queries and screenshots documented in docs/GRAFANA.md.
 
-Fixed by raising memory limits to realistic values
+Deliverables (what I included)
+environment/before-fix/ — broken manifests
 
-4️⃣ Incorrect readiness in init-container chain
+environment/after-fix/ — fixed manifests
 
-Init container blocked boot due to earlier failures
+troubleshooting/* — diagnostics, fixes, validation artifacts (per problem)
 
-Fixed after DNS + backend service issues resolved
+scripts/ — automation and debug commands
 
-🧪 How to Deploy, Test, and Fix
-1. Create the cluster
-cd cluster/
-./create-cluster.sh
+docs/REPORT.md — final report (Markdown)
 
-2. Deploy the broken environment
-cd scripts/
-./deploy-broken.sh
+docs/RCA.md, docs/IMPROVEMENTS.md, docs/GRAFANA.md
 
+screenshots/grafana/ — 5 screenshots showing the monitoring evidence
 
-This will deploy:
+scripts/grafana-dashboard.json — exported Grafana dashboard JSON
 
-Broken backend
+Recommended order for reviewers
+Open docs/REPORT.md (high-level summary)
 
-Broken frontend
+Read docs/RCA.md (root cause analysis)
 
-Wrong service
+Inspect troubleshooting/problem-*/diagnostics/* files to see raw evidence
 
-DNS-blocking NetworkPolicy
+Inspect environment/before-fix/ to understand the broken manifests
 
-3. Install monitoring (Prometheus + Grafana + Metrics Server)
-./install-monitoring.sh
+Inspect environment/after-fix/ for the actual fixes
 
+Confirm via troubleshooting/problem-*/validation/* that fixes applied cleanly
 
-All values are in:
-scripts/monitoring-stack-config.yaml
+Check Grafana screenshots in screenshots/grafana/ and docs/GRAFANA.md
 
-4. Investigate issues
+Notes for evaluators
+The main report is provided as Markdown (docs/REPORT.md). Markdown is acceptable because it is human-readable in GitHub; generating a PDF is optional. If you prefer a PDF, I can export REPORT.md to REPORT.pdf on request.
 
-Run commands from:
+All kubectl outputs used as evidence are included as .txt files inside the appropriate troubleshooting/*/diagnostics and troubleshooting/*/validation folders.
 
-scripts/debug-commands.md
+Cleanup
+To delete deployed resources:
 
-
-All diagnostic outputs are already stored under:
-
-troubleshooting/problem-*/diagnostics/
-
-5. Apply fixes
-./deploy-fixed.sh
-
-
-All corrected manifests stored in:
-
-environment/after-fix/
-
-6. Validate
-
-Validation commands + outputs saved under:
-
-troubleshooting/problem-*/validation/
-
-📊 Grafana Dashboards (Monitoring Evidence)
-
-Dashboard screenshots stored in:
-
-screenshots/grafana/
-
-
-You included 5 key panels as required:
-
-Cluster overview
-
-Pod memory usage
-
-Pod restart count
-
-Node resource usage
-
-OOMKilled events
-
-Documentation + PromQL queries are in:
-
-docs/GRAFANA.md
-
-
-A dashboard export JSON is in:
-
-scripts/grafana-dashboard.json
-
-📄 Final Documentation (Evaluator Should Read)
-
-Located in docs/:
-
-File	Purpose
-REPORT.md	Main submission report
-RCA.md	Deep dive Root Cause Analysis
-IMPROVEMENTS.md	Reliability & SRE improvements
-GRAFANA.md	Dashboards, panels, queries & evidence
+bash
+Copy code
+cd scripts
+./cleanup.sh
