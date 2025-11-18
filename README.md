@@ -63,10 +63,10 @@ Each problem folder contains:
 ### **Problem 1 — NetworkPolicy Blocking DNS**
 - CoreDNS unreachable due to blocked UDP/TCP 53
 - Breakage: frontend couldn't resolve backend service
-- Fix: Updated NetworkPolicy to allow DNS egress traffic
+- Fix: Updated NetworkPolicy to allow DNS ingress traffic to CoreDNS
 
 ### **Problem 2 — Incorrect Backend Service Name**
-- The frontend Deployment referenced `backed` instead of `backend`
+- The frontend Deployment referenced `backed-svc-wrong` instead of `backend-svc`
 - Breakage: DNS resolution failed inside frontend pod
 - Fix: Corrected the env variable and Deployment manifest
 
