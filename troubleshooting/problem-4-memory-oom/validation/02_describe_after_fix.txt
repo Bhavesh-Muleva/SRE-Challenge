@@ -1,20 +1,20 @@
-Name:             frontend-6444b6db87-zjsq8
+Name:             frontend-dd7dcb6c6-zjwjt
 Namespace:        default
 Priority:         0
 Service Account:  default
 Node:             atlan-cluster-worker/172.18.0.2
-Start Time:       Sun, 16 Nov 2025 18:21:13 +0530
+Start Time:       Tue, 18 Nov 2025 11:32:37 +0530
 Labels:           app=frontend
-                  pod-template-hash=6444b6db87
+                  pod-template-hash=dd7dcb6c6
 Annotations:      <none>
 Status:           Running
-IP:               10.244.1.39
+IP:               10.244.1.71
 IPs:
-  IP:           10.244.1.39
-Controlled By:  ReplicaSet/frontend-6444b6db87
+  IP:           10.244.1.71
+Controlled By:  ReplicaSet/frontend-dd7dcb6c6
 Init Containers:
   wait-for-backend:
-    Container ID:  containerd://da6fd0e553b538789e0d9a081ddedef3f110447d25596e282aa44b868c66355c
+    Container ID:  containerd://b61e82337535948779abde6e6dafb08cd16d99c597a76c396af1a0696875c92d
     Image:         curlimages/curl:7.87.0
     Image ID:      docker.io/curlimages/curl@sha256:f7f265d5c64eb4463a43a99b6bf773f9e61a50aaa7cefaf564f43e42549a01dd
     Port:          <none>
@@ -41,16 +41,16 @@ Init Containers:
     State:          Terminated
       Reason:       Completed
       Exit Code:    0
-      Started:      Sun, 16 Nov 2025 18:21:14 +0530
-      Finished:     Sun, 16 Nov 2025 18:21:14 +0530
+      Started:      Tue, 18 Nov 2025 11:32:38 +0530
+      Finished:     Tue, 18 Nov 2025 11:32:38 +0530
     Ready:          True
     Restart Count:  0
     Environment:    <none>
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-48pt7 (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-8mb5d (ro)
 Containers:
   frontend:
-    Container ID:  containerd://3503dd390982dfb6c8577665317fac6e1bae5612beaaeafd5fdb2b5b963aa1d8
+    Container ID:  containerd://90f2b551f93182cd61a53e26b13fa92f216d76eecc676e91b221c9a81c47289e
     Image:         busybox
     Image ID:      docker.io/library/busybox@sha256:e3652a00a2fabd16ce889f0aa32c38eec347b997e73bd09e69c962ec7f8732ee
     Port:          <none>
@@ -59,24 +59,25 @@ Containers:
       sh
       -c
     Args:
-      echo "Starting frontend workload"
-      # still memory intensive but now allowed
+      echo "Starting slow memory leak..."
       while true; do
-        dd if=/dev/zero of=/dev/shm/fill bs=1M count=50
+        dd if=/dev/zero bs=1M count=1 >> /dev/shm/leak 2>/dev/null
+        echo "+1MB allocated"
+        sleep 1
       done
       
     State:          Running
-      Started:      Sun, 16 Nov 2025 18:21:17 +0530
+      Started:      Tue, 18 Nov 2025 11:32:41 +0530
     Ready:          True
     Restart Count:  0
     Limits:
-      memory:  256Mi
+      memory:  200Mi
     Requests:
-      memory:  128Mi
+      memory:  100Mi
     Environment:
-      BACKEND_URL:  http://backend-svc.default.svc.cluster.local
+      BACKEND_URL:  http://backend-svc-wrong.default.svc.cluster.local
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-48pt7 (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-8mb5d (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
@@ -85,7 +86,7 @@ Conditions:
   ContainersReady             True 
   PodScheduled                True 
 Volumes:
-  kube-api-access-48pt7:
+  kube-api-access-8mb5d:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
@@ -98,11 +99,11 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type    Reason     Age   From               Message
   ----    ------     ----  ----               -------
-  Normal  Scheduled  24s   default-scheduler  Successfully assigned default/frontend-6444b6db87-zjsq8 to atlan-cluster-worker
-  Normal  Pulled     23s   kubelet            Container image "curlimages/curl:7.87.0" already present on machine
-  Normal  Created    23s   kubelet            Created container: wait-for-backend
-  Normal  Started    23s   kubelet            Started container wait-for-backend
-  Normal  Pulling    23s   kubelet            Pulling image "busybox"
-  Normal  Pulled     21s   kubelet            Successfully pulled image "busybox" in 2.069s (2.069s including waiting). Image size: 1913613 bytes.
-  Normal  Created    20s   kubelet            Created container: frontend
-  Normal  Started    20s   kubelet            Started container frontend
+  Normal  Scheduled  52s   default-scheduler  Successfully assigned default/frontend-dd7dcb6c6-zjwjt to atlan-cluster-worker
+  Normal  Pulled     51s   kubelet            Container image "curlimages/curl:7.87.0" already present on machine
+  Normal  Created    51s   kubelet            Created container: wait-for-backend
+  Normal  Started    51s   kubelet            Started container wait-for-backend
+  Normal  Pulling    50s   kubelet            Pulling image "busybox"
+  Normal  Pulled     48s   kubelet            Successfully pulled image "busybox" in 2.199s (2.199s including waiting). Image size: 1913613 bytes.
+  Normal  Created    48s   kubelet            Created container: frontend
+  Normal  Started    48s   kubelet            Started container frontend

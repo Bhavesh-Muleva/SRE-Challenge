@@ -1,4 +1,4 @@
-kubectl logs -l app=frontend -c wait-for-backend --previous
+kubectl logs -l app=frontend -c wait-for-backend
 
 [1] Checking DNS connectivity...
 ;; connection timed out; no servers could be reached

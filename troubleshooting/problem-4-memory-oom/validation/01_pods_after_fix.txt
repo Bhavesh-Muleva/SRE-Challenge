@@ -1,0 +1,3 @@
+NAME                        READY   STATUS        RESTARTS      AGE
+backend-6cd8cdff58-ctpsc    1/1     Running       0             142m
+frontend-dd7dcb6c6-zjwjt    1/1     Running       0             5s

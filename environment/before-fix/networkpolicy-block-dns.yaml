@@ -1,51 +1,12 @@
-# apiVersion: networking.k8s.io/v1
-# kind: NetworkPolicy
-# metadata:
-#   name: deny-dns
-# spec:
-#   podSelector: {}
-#   policyTypes:
-#   - Egress
-#   egress:
-#   - to:
-#     - ipBlock:
-#         cidr: 0.0.0.0/0
-#     ports:
-#     - port: 80
-#       protocol: TCP
-# # DNS blocked (no port 53 rule)
-
-# apiVersion: networking.k8s.io/v1
-# kind: NetworkPolicy
-# metadata:
-#   name: block-dns-ingress
-#   namespace: kube-system
-# spec:
-#   podSelector:
-#     matchLabels:
-#       k8s-app: kube-dns   # THIS TARGETS COREDNS PODS
-#   policyTypes:
-#     - Ingress
-#   ingress: []  # 🚫 NO INGRESS ALLOWED TO COREDNS PODS
-
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: frontend-network-policy
-  namespace: default
+  name: dns-ingress
+  namespace: kube-system
 spec:
   podSelector:
     matchLabels:
-      app: frontend           # ONLY frontend pods targeted
+      k8s-app: kube-dns   # THIS TARGETS COREDNS PODS
   policyTypes:
-    - Egress
-  egress:
-    # Allow everything EXCEPT DNS
-    - ports:
-        - protocol: TCP
-          port: 80           # allow HTTP to services
-        - protocol: TCP
-          port: 443          # allow HTTPS (optional)
-      to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
+    - Ingress
+  ingress: []  # 🚫 NO INGRESS ALLOWED TO COREDNS PODS

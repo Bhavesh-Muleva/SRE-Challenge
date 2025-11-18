@@ -1,0 +1,4 @@
+k top po frontend-dd7dcb6c6-zjwjt
+
+NAME                       CPU(cores)   MEMORY(bytes)   
+frontend-dd7dcb6c6-zjwjt   5m           64Mi

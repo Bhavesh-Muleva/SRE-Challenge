@@ -28,7 +28,7 @@ spec:
 
             echo "[2] DNS OK. Checking backend URL connectivity..."
 
-            if ! curl -f --max-time 2 http://backend-svc.default.svc.cluster.local; then    # <----- Endpoint Fixed
+            if ! curl -f --max-time 2 http://backend-svc.default.svc.cluster.local; then
               echo "Backend URL check failed (doesn't exist or incorrect name)."
               exit 1
             fi
@@ -40,17 +40,22 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            echo "Starting frontend workload"
-            # still memory intensive but now allowed
-            while true; do
-              dd if=/dev/zero of=/dev/shm/fill bs=1M count=50
+            echo "Starting slow memory leak..."
+            i=0
+            while [ $i -lt 60 ]; do
+              dd if=/dev/zero bs=1M count=1 >> /dev/shm/leak 2>/dev/null
+              i=$((i + 1))
+              echo "+1MB allocated ($i MB total)"
+              sleep 1
             done
+
+            echo "Done allocating 60MB. Sleeping forever..."
+            sleep infinity
         resources:
-          requests:
-            memory: "128Mi"     # Increased from 20Mi
           limits:
-            memory: "256Mi"     # Increased from 30Mi → FIX
+            memory: "200Mi"  # Increased the limits
+          requests:
+            memory: "100Mi"  # Increased the requests
         env:
         - name: BACKEND_URL
-          value: "http://backend-svc.default.svc.cluster.local"
-
+          value: "http://backend-svc-wrong.default.svc.cluster.local"

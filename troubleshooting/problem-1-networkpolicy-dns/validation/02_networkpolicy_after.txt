@@ -1,0 +1,13 @@
+Name:         dns-ingress
+Namespace:    kube-system
+Created on:   2025-11-18 10:02:12 +0530 IST
+Labels:       <none>
+Annotations:  <none>
+Spec:
+  PodSelector:     k8s-app=kube-dns
+  Allowing ingress traffic:
+    To Port: 53/UDP
+    To Port: 53/TCP
+    From: <any> (traffic not restricted by source)
+  Not affecting egress traffic
+  Policy Types: Ingress

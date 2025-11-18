@@ -1,0 +1,12 @@
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+Non-authoritative answer:
+Name:	google.com
+Address: 142.250.70.78
+
+Non-authoritative answer:
+Name:	google.com
+Address: 2404:6800:4009:803::200e
+
+pod "curl-test" deleted from default namespace

@@ -1,0 +1,16 @@
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+** server can't find backend-svc.cluster.local: NXDOMAIN
+
+** server can't find backend-svc.svc.cluster.local: NXDOMAIN
+
+Name:	backend-svc.default.svc.cluster.local              # <--------  service is resolving to an IP address.
+Address: 10.96.184.164
+
+** server can't find backend-svc.svc.cluster.local: NXDOMAIN
+
+** server can't find backend-svc.cluster.local: NXDOMAIN
+
+
+pod "curl-test" deleted from default namespace

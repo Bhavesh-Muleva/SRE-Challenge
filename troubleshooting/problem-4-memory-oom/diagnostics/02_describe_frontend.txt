@@ -1,0 +1,117 @@
+kubectl describe po frontend-66dc59c654-nllhr
+
+Name:             frontend-66dc59c654-nllhr
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             atlan-cluster-worker/172.18.0.2
+Start Time:       Tue, 18 Nov 2025 11:14:34 +0530
+Labels:           app=frontend
+                  pod-template-hash=66dc59c654
+Annotations:      <none>
+Status:           Running
+IP:               10.244.1.70
+IPs:
+  IP:           10.244.1.70
+Controlled By:  ReplicaSet/frontend-66dc59c654
+Init Containers:
+  wait-for-backend:
+    Container ID:  containerd://2036cc10fcef1bdd79bc3dbd672e19b734514b2320f6e4933320ca86a30d0e6f
+    Image:         curlimages/curl:7.87.0
+    Image ID:      docker.io/curlimages/curl@sha256:f7f265d5c64eb4463a43a99b6bf773f9e61a50aaa7cefaf564f43e42549a01dd
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+    Args:
+      echo "[1] Checking DNS connectivity..."
+      if ! nslookup google.com; then
+        echo "DNS check failed: cannot resolve google.com"
+        exit 1
+      fi
+      
+      echo "[2] DNS OK. Checking backend URL connectivity..."
+      
+      if ! curl -f --max-time 2 http://backend-svc.default.svc.cluster.local; then
+        echo "Backend URL check failed (doesn't exist or incorrect name)."
+        exit 1
+      fi
+      
+      echo "[3] Backend reachable. Init complete."
+      
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 18 Nov 2025 11:14:34 +0530
+      Finished:     Tue, 18 Nov 2025 11:14:34 +0530
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-t784m (ro)
+Containers:
+  frontend:
+    Container ID:  containerd://54a9b9c8dfafe4d6a387b99140f00075b69fe60716851084bc267abde8293686
+    Image:         busybox
+    Image ID:      docker.io/library/busybox@sha256:e3652a00a2fabd16ce889f0aa32c38eec347b997e73bd09e69c962ec7f8732ee
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+    Args:
+      echo "Starting slow memory leak..."
+      while true; do
+        dd if=/dev/zero bs=1M count=1 >> /dev/shm/leak 2>/dev/null
+        echo "+1MB allocated"
+        sleep 1
+      done
+      
+    State:          Running
+      Started:      Tue, 18 Nov 2025 11:15:28 +0530
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Tue, 18 Nov 2025 11:14:37 +0530
+      Finished:     Tue, 18 Nov 2025 11:15:25 +0530
+    Ready:          True
+    Restart Count:  1
+    Limits:
+      memory:  50Mi
+    Requests:
+      memory:  20Mi
+    Environment:
+      BACKEND_URL:  http://backend-svc-wrong.default.svc.cluster.local
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-t784m (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-t784m:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age                From               Message
+  ----    ------     ----               ----               -------
+  Normal  Scheduled  92s                default-scheduler  Successfully assigned default/frontend-66dc59c654-nllhr to atlan-cluster-worker
+  Normal  Pulled     92s                kubelet            Container image "curlimages/curl:7.87.0" already present on machine
+  Normal  Created    92s                kubelet            Created container: wait-for-backend
+  Normal  Started    92s                kubelet            Started container wait-for-backend
+  Normal  Pulled     89s                kubelet            Successfully pulled image "busybox" in 2.202s (2.202s including waiting). Image size: 1913613 bytes.
+  Normal  Pulling    40s (x2 over 91s)  kubelet            Pulling image "busybox"
+  Normal  Created    38s (x2 over 89s)  kubelet            Created container: frontend
+  Normal  Started    38s (x2 over 89s)  kubelet            Started container frontend
+  Normal  Pulled     38s                kubelet            Successfully pulled image "busybox" in 2.284s (2.284s including waiting). Image size: 1913613 bytes.

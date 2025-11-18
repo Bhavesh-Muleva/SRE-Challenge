@@ -1,7 +1,4 @@
 kubectl run dns-test --rm -it --image=nicolaka/netshoot --restart=Never -- nslookup google.com
-
-;; communications error to 10.96.0.10#53: timed out
-;; communications error to 10.96.0.10#53: timed out
 ;; communications error to 10.96.0.10#53: timed out
 ;; no servers could be reached
 

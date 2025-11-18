@@ -1,24 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: frontend-network-policy
-  namespace: default
+  name: dns-ingress
+  namespace: kube-system
 spec:
   podSelector:
     matchLabels:
-      app: frontend
+      k8s-app: kube-dns
   policyTypes:
-    - Egress
-  egress:
-    - ports:
-        - protocol: TCP
-          port: 80        # allow HTTP
-        - protocol: TCP
-          port: 443       # allow HTTPS
-        - protocol: UDP
-          port: 53        # allow DNS
-        - protocol: TCP
-          port: 53        # allow DNS
-      to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
+  - Ingress
+  ingress:
+  - ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53

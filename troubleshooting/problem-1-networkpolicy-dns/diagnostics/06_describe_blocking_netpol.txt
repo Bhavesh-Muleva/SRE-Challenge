@@ -1,0 +1,11 @@
+Name:         dns-ingress
+Namespace:    kube-system
+Created on:   2025-11-18 10:02:12 +0530 IST
+Labels:       <none>
+Annotations:  <none>
+Spec:
+  PodSelector:     k8s-app=kube-dns
+  Allowing ingress traffic:
+    <none> (Selected pods are isolated for ingress connectivity)
+  Not affecting egress traffic
+  Policy Types: Ingress
