@@ -45,6 +45,13 @@ The challenge involved **four Kubernetes failures which caused outage**, all of 
 
 ---
 
+Detailed explanations for all issues are available in:
+```bash
+REPORT.md
+```
+
+---
+
 Each problem folder contains:
 
 - **diagnostics/** — All commands and evidence collected before applying the fix  
@@ -73,10 +80,6 @@ Each problem folder contains:
 - Breakage: CrashLoopBackOff
 - Fix: Increased memory limits and requests; redeployed
 
-Detailed explanations for all issues are available in:
-```bash
-REPORT.md
-```
 
 ---
 
