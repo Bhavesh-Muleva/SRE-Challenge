@@ -1,200 +1,100 @@
-# Challenge (Submission)
+# SRE-II Challenge
+**Cluster Type:** Kind (Kubernetes-in-Docker)  
+**Monitoring Stack:** kube-prometheus-stack (Prometheus + Grafana)
 
-Author: Bhavesh Muleva
+This repository contains the full solution to the Atlan SRE-II Challenge, including a simulated broken Kubernetes environment, diagnostics, fixes, validation evidence, monitoring outputs, and a structured final report.
 
-This repository contains a reproducible SRE challenge environment with four deliberate Kubernetes failures. It includes diagnostics, fixes, validation artifacts, monitoring setup, and documentation.
-
----
-
-## Status
-
-- Broken environment recreated  
-- All four problems diagnosed and fixed  
-- Validation artifacts included  
-- Grafana dashboards and exported JSON included  
-- Report, RCA, Improvements, Monitoring documentation included  
+The challenge involved **four Kubernetes failures which caused outage**, all of which were reproduced, debugged, fixed, and verified.
 
 ---
 
-## Directory Overview
+## 1. Repository Structure
 
-- environment/before-fix/ — manifests creating the broken environment  
-- environment/after-fix/ — manifests containing fixes  
-- troubleshooting/ — diagnostics, fixes, validation (per problem)  
-- scripts/  
-  - deploy-broken.sh  
-  - deploy-fixed.sh  
-  - install-monitoring.sh  
-  - cleanup.sh  
-  - test-connectivity.sh  
-  - debug-commands.md  
-  - grafana-dashboard.json  
-- docs/  
-  - REPORT.md  
-  - RCA.md  
-  - IMPROVEMENTS.md  
-  - GRAFANA.md  
-- screenshots/grafana/ — Grafana screenshots used as evidence  
+├── environment/
+│ ├── before-fix/ # Broken manifests used to simulate the failures
+│ └── after-fix/ # Final working manifests
+│
+├── scripts/ # Deployment, monitoring stack, and test helpers
+│ ├── deploy-broken.sh
+│ ├── deploy-fixed.sh
+│ ├── install-monitoring.sh
+│ 
+│
+├── screenshots/ # Grafana Dashboard Screenshot
+│
+├── troubleshooting/
+│ ├── problem-1-networkpolicy-dns/
+│ │ ├── diagnostics/
+│ │ ├── fix/
+│ │ └── validation/
+│ │
+│ ├── problem-2-service-dns/
+│ │ ├── diagnostics/
+│ │ ├── fix/
+│ │ └── validation/
+│ │
+│ ├── problem-3-service-endpoints/
+│ │ ├── diagnostics/
+│ │ ├── fix/
+│ │ └── validation/
+│ │
+│ └── problem-4-memory-oom/
+│ ├── diagnostics/
+│ ├── fix/
+│ └── validation/
 
 ---
 
-## Prerequisites
+Each problem folder contains:
 
-- kubectl installed and configured  
-- helm v3 installed  
-- Bash or POSIX-compliant shell  
-- (Optional) kind for local testing  
+- **diagnostics/** — All commands and evidence collected before applying the fix  
+- **fix/** — Corrected manifests and configuration  
+- **validation/** — Outputs proving the issue was resolved  
 
-### Create a kind cluster (optional)
+---
 
+### **Problem 1 — NetworkPolicy Blocking DNS**
+- CoreDNS unreachable due to blocked UDP/TCP 53
+- Breakage: frontend couldn't resolve backend service
+- Fix: Updated NetworkPolicy to allow DNS egress traffic
+
+### **Problem 2 — Incorrect Backend Service Name**
+- The frontend Deployment referenced `backed` instead of `backend`
+- Breakage: DNS resolution failed inside frontend pod
+- Fix: Corrected the env variable and Deployment manifest
+
+### **Problem 3 — Service Selector Mismatch (Empty Endpoints)**
+- Backend Service selected wrong label (`app: backend` vs `app: backend-api`)
+- Breakage: Service had zero endpoints
+- Fix: Updated backend Service selector to match pod labels
+
+### **Problem 4 — OOMKilled (Insufficient Memory Limits)**
+- Frontend repeatedly restarted due to low memory limit
+- Breakage: CrashLoopBackOff
+- Fix: Increased memory limits and requests; redeployed
+
+Detailed explanations for all issues are available in:
 ```bash
-cd cluster
-./create-cluster.sh
+REPORT.md
 ```
 
 ---
 
-# How to Reproduce
+How to Reproduce the Environment
 
-## 1. Deploy the broken environment
-
+### Step 1 — Create a Kind cluster
 ```bash
-cd scripts
-./deploy-broken.sh
+kind create cluster --config kind-config.yaml
 ```
-
-Check pod status:
-
+### Step 2 — Deploy the broken environment
 ```bash
-kubectl get pods -o wide
+bash scripts/deploy-broken.sh
 ```
-
----
-
-## 2. (Optional) Install monitoring
-
-Run:
-
+### Step 3 — Install monitoring stack
 ```bash
-./install-monitoring.sh
+bash scripts/install-monitoring.sh
 ```
-
-Port-forward Grafana:
-
+Grafana becomes available at:
 ```bash
-kubectl port-forward -n monitoring svc/kube-prom-stack-grafana 3000:80
-```
-
-Visit:
-
-```
-http://localhost:3000
-```
-
-Username: admin  
-Password: from Grafana secret
-
----
-
-## 3. Run diagnostics
-
-All commands used are listed in:
-
-```
-scripts/debug-commands.md
-```
-
-Diagnostic outputs are stored in:
-
-```
-troubleshooting/problem-*/diagnostics/
-```
-
----
-
-## 4. Apply fixes
-
-```bash
-./deploy-fixed.sh
-```
-
-Fixes are taken from:
-
-```
-environment/after-fix/
-```
-
----
-
-# Validation
-
-Validation artifacts (kubectl outputs, logs, connectivity tests, before/after comparisons) are stored under each problem’s validation directory:
-
-- troubleshooting/problem-1-networkpolicy-dns/validation/  
-- troubleshooting/problem-2-service-dns-and-endpoints/validation/  
-- troubleshooting/problem-3-memory-oom/validation/  
-- troubleshooting/problem-4-networkpolicy-dns/validation/  
-
-Grafana screenshots:
-
-```
-screenshots/grafana/
-```
-
-Exported Grafana dashboard JSON:
-
-```
-scripts/grafana-dashboard.json
-```
-
-All command outputs are saved as `.txt` files inside the diagnostics/ and validation/ folders.
-
----
-
-# Summary of Fixes
-
-- Allowed DNS traffic in NetworkPolicy  
-- Corrected BACKEND_URL environment variable in frontend  
-- Fixed backend Service selector so endpoints populate  
-- Increased frontend memory limits to prevent OOMKilled  
-- Installed kube-prometheus-stack and captured monitoring evidence  
-- Added PromQL queries and dashboard analysis in docs/GRAFANA.md  
-
----
-
-# Deliverables
-
-- environment/before-fix/ — broken manifests  
-- environment/after-fix/ — fixed manifests  
-- troubleshooting/* — diagnostics, fixes, validation  
-- scripts/ — deployment, monitoring, cleanup, debugging scripts  
-- docs/REPORT.md — final report  
-- docs/RCA.md  
-- docs/IMPROVEMENTS.md  
-- docs/GRAFANA.md  
-- screenshots/grafana/ — dashboard screenshots  
-- scripts/grafana-dashboard.json — exported dashboard  
-
----
-
-# Recommended Review Order
-
-1. docs/REPORT.md  
-2. docs/RCA.md  
-3. troubleshooting/problem-*/diagnostics/  
-4. environment/before-fix/  
-5. environment/after-fix/  
-6. troubleshooting/problem-*/validation/  
-7. screenshots/grafana/  
-8. docs/GRAFANA.md  
-
----
-
-# Cleanup
-
-To delete all deployed resources:
-
-```bash
-cd scripts
-./cleanup.sh
+http://localhost:3000/
 ```
