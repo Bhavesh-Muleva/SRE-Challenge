@@ -40,24 +40,16 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            echo "Starting controlled memory eater..."
-
-            TARGET_MB=${TARGET_MB:-50}   # Total memory needed
-            STEP_MB=${STEP_MB:-5}        # Allocate per iteration
-            SLEEP=${SLEEP:-1}            # Delay between allocations
-
+            echo "Starting slow memory leak..."
             i=0
-            data=""
-
-            while [ $i -lt $TARGET_MB ]; do
-              chunk=$(dd if=/dev/zero bs=1M count=$STEP_MB 2>/dev/null)
-              data="$data$chunk"
-              i=$((i + STEP_MB))
-              echo "Allocated ${i}MB / ${TARGET_MB}MB"
-              sleep $SLEEP
+            while [ $i -lt 60 ]; do
+              dd if=/dev/zero bs=1M count=1 >> /dev/shm/leak 2>/dev/null
+              i=$((i + 1))
+              echo "+1MB allocated ($i MB total)"
+              sleep 1
             done
 
-            echo "Finished allocating memory. Sleeping..."
+            echo "Done allocating 60MB. Sleeping forever..."
             sleep infinity
         resources:
           requests:
@@ -67,11 +59,3 @@ spec:
         env:
         - name: BACKEND_URL
           value: "http://backend-svc.default.svc.cluster.local" # <----- Endpoint Fixed
-        - name: TARGET_MB
-          value: "50"
-        - name: STEP_MB
-          value: "5"
-        - name: SLEEP
-          value: "1"
-          
-
