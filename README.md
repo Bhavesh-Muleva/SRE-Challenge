@@ -87,7 +87,7 @@ How to Reproduce the Environment
 
 ### Step 1 — Create a Kind cluster
 ```bash
-kind create cluster --config kind-config.yaml
+kind create cluster --config cluster/kind-config.yaml
 ```
 ### Step 2 — Deploy the broken environment
 ```bash
