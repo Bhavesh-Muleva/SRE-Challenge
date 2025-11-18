@@ -17,6 +17,7 @@ readinessProbe:
     port: 8080
   initialDelaySeconds: 3
   periodSeconds: 5
+```
 Benefits:
 
 Ensures pods receive traffic only when ready
@@ -42,12 +43,10 @@ Reduces production outages caused by YAML mistakes
 
 ✅ 1.3 Apply PodDisruptionBudgets (PDBs)
 To avoid voluntary disruptions taking down all replicas:
-
-yaml
-Copy code
+```yaml
 minAvailable: 1
 Benefits:
-
+```
 Ensures at least one replica stays healthy
 
 Protects services during node drain / upgrade operations
@@ -171,12 +170,12 @@ Reduces misconfigurations going to production.
 ✅ 5.2 Canary Deployments
 Use canary strategy:
 
-yaml
-Copy code
+```yaml
 strategy:
   rollingUpdate:
     maxUnavailable: 0
     maxSurge: 1
+```
 Benefits:
 Safer rollouts, easier rollback.
 
@@ -201,12 +200,11 @@ Minimizes lateral movement inside cluster.
 
 ✅ 6.2 Enforce Non-root Pod Security Policies
 Example:
-
-yaml
-Copy code
+```yaml
 securityContext:
   runAsNonRoot: true
   allowPrivilegeEscalation: false
+```
 Benefits:
 Protects cluster from compromised containers.
 
