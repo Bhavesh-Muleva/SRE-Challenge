@@ -1,5 +1,4 @@
 # SRE-II Challenge — Final Report
-**Author:** Bhavesh Muleva  
 **Environment:** Kind-based Kubernetes cluster  
 **Monitoring:** Prometheus + Grafana (kube-prometheus-stack)
 
@@ -16,20 +15,17 @@ This challenge simulates a production outage involving three independent issues:
 The objective was to reproduce, diagnose, fix, and verify each issue using Kubernetes tooling and monitoring dashboards.  
 All evidence files are stored under:
 
+```bash
 troubleshooting/problem-/diagnostics/
 troubleshooting/problem-/fix/
 troubleshooting/problem-*/validation/
-
-sql
-Copy code
+```
 
 Grafana screenshots are located under:
 
+```bash
 screenshots/
-
-yaml
-Copy code
-
+```
 ---
 
 ## 2. Problem 1: NetworkPolicy Blocking DNS
@@ -43,16 +39,14 @@ Copy code
 ### Diagnostics
 
 Key evidence files:
-
+```bash
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/01_pods_wide.txt
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/04_nslookup_backend_before.txt
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/05_ping_backend_before.txt
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/07_resolvconf_before.txt
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/09_describe_blocking_netpol.txt
 troubleshooting/problem-1-networkpolicy-dns/diagnostics/11_coredns_logs.txt
-
-markdown
-Copy code
+```
 
 Findings:
 
@@ -69,22 +63,18 @@ A restrictive NetworkPolicy blocked DNS egress for UDP/TCP port 53.
 
 - Added egress rules to allow DNS traffic towards CoreDNS.
 - Applied updated policy:
-
+```bash
 troubleshooting/problem-1-networkpolicy-dns/fix/network-policy-fixed.yaml
 troubleshooting/problem-1-networkpolicy-dns/fix/networkpolicy.patch
-
-shell
-Copy code
+```
 
 ### Verification
-
+```bash
 troubleshooting/problem-1-networkpolicy-dns/validation/01_nslookup_backend_after.txt
 troubleshooting/problem-1-networkpolicy-dns/validation/03_curl_backend_after.txt
 troubleshooting/problem-1-networkpolicy-dns/validation/05_nc_port53_after.txt
 troubleshooting/problem-1-networkpolicy-dns/validation/07_endpoints_after.txt
-
-yaml
-Copy code
+```
 
 DNS resolution and connectivity were restored.
 
@@ -100,14 +90,12 @@ DNS resolution and connectivity were restored.
 ### Diagnostics
 
 Evidence files:
-
+```bash
 troubleshooting/problem-2-service-dns/diagnostics/01_nslookup_backend_before.txt
 troubleshooting/problem-2-service-dns/diagnostics/03_nslookup_backed_before.txt
 troubleshooting/problem-2-service-dns/diagnostics/04_frontend_logs_before.txt
 troubleshooting/problem-2-service-dns/diagnostics/06_describe_frontend_deploy_before.txt
-
-markdown
-Copy code
+```
 
 Findings:
 
@@ -123,21 +111,17 @@ Deployment manifest contained a typo in the backend URL.
 
 - Updated Deployment to reference correct service name.
 - Saved corrected YAML:
-
+```bash
 troubleshooting/problem-2-service-dns/fix/frontend-deploy-fix.yaml
 troubleshooting/problem-2-service-dns/fix/frontend-deploy.patch
-
-shell
-Copy code
+```
 
 ### Verification
-
+```bash
 troubleshooting/problem-2-service-dns/validation/01_nslookup_backend_after.txt
 troubleshooting/problem-2-service-dns/validation/02_curl_backend_after.txt
 troubleshooting/problem-2-service-dns/validation/06_backend_endpoints_after.txt
-
-yaml
-Copy code
+```
 
 Frontend successfully reached backend after correction.
 
@@ -153,12 +137,10 @@ Frontend successfully reached backend after correction.
 ### Diagnostics
 
 Evidence:
-
+```bash
 screenshots/oom/
 troubleshooting/problem-3-oom/diagnostics/describe_frontend_pod.txt
-
-yaml
-Copy code
+```
 
 Findings:
 
@@ -191,19 +173,14 @@ Grafana dashboards were used for:
 - Pod restart count:  
 sum by (pod)(kube_pod_container_status_restarts_total{pod=~"$pod"})
 
-sql
-Copy code
 - Node/pod memory usage  
 - Pod restarts over time  
 - Correlation between OOM events and memory limit exhaustion
 
 Screenshots are available under:
-
+```bash
 screenshots/
-
-yaml
-Copy code
-
+```
 Monitoring was essential to confirm memory-related behavior and validate system recovery.
 
 ---
@@ -217,13 +194,11 @@ If similar issues occur in EKS inside a private VPC:
 - CoreDNS pods in private subnets require NAT Gateway for upstream DNS.  
 - Pod-to-pod traffic relies on correct security groups and CNI rules.  
 - Commands such as the following would be helpful:
-
+```bash
 aws ec2 describe-security-groups --group-ids <sg-id>
 aws eks describe-cluster --name <cluster>
 kubectl -n kube-system logs -l k8s-app=kube-dns
-
-yaml
-Copy code
+```
 
 ---
 
@@ -252,4 +227,6 @@ Copy code
 
 All verification outputs are stored under:
 
+```bash
 troubleshooting/*/validation/
+```
