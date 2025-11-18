@@ -70,7 +70,7 @@ DNS resolution and connectivity restored.
 
 ### Symptoms
 - Frontend container logs indicated:
-lookup backed: no such host
+curl: (6) Could not resolve host: backend-svc-wrong.default.svc.cluster.local
 
 
 - DNS resolution for backend failed.
